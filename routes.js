@@ -4,15 +4,6 @@ const seedrandom = require("seedrandom");
 const data = require("./data");
 
 const stuff = [
-	route.post(`/checkPassword`, async function(ctx) {
-		const { fight_id, password } = ctx.request.body;
-		{
-			ctx.response.status = 401;
-			ctx.body = { success: false, message: "please supply correct password" };
-			return;
-		}
-		ctx.body = { success: true, password: password };
-	}),
 	route.get(`/questions/:code`, async function(ctx, code) {
 		const deobfCode = (parseInt(Buffer.from(code, "base64").toString()) - 19654) / 23;
 		const rounds = deobfCode % 10;

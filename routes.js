@@ -1,7 +1,9 @@
 const route = require("koa-route");
 const seedrandom = require("seedrandom");
+var moment = require("moment");
 
 const data = require("./data");
+let scores = [];
 
 const stuff = [
 	route.get(`/questions/:code`, async function(ctx, code) {
@@ -55,6 +57,36 @@ const stuff = [
 		});
 		ctx.response.status = 200;
 		ctx.body = answers;
+	}),
+	route.get(`/ranking/:code`, async function(ctx, code) {
+		console.log(scores);
+		const ranking = scores
+			.filter((score) => {
+				const timeDiff = moment.duration(moment().diff(score.time)).asHours();
+				return score.code === code && timeDiff <= 1;
+			})
+			.sort((a, b) => b.score - a.score);
+		ctx.response.status = 200;
+		ctx.body = ranking;
+	}),
+	route.post(`/score`, async function(ctx) {
+		const scoreData = ctx.request.body;
+		if (!(typeof scoreData.score !== "undefined" && scoreData.name && scoreData.seed)) {
+			ctx.response.status = 400;
+			ctx.body = {
+				message: `ERROR`,
+				success: false,
+			};
+			return;
+		}
+
+		const code = scoreData.seed;
+		scores.push({ time: moment(), code, name: scoreData.name, score: scoreData.score });
+
+		console.log(scores);
+
+		ctx.response.status = 200;
+		return;
 	}),
 ];
 
